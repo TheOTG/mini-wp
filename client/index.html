@@ -21,12 +21,12 @@
                 <div id="topLeftHeader" class="d-flex flex-row">
                     <ul>
                         <a href="#" @click="listArticlePage"><li class="wpLogo"><i class="fab fa-wordpress fa-lg"></i></li></a>
-                        <a href="#"><li class="reader"><i class="far fa-newspaper"></i> Reader</li></a>
+                        <a href="#" @click="listArticlePage"><li class="reader"><i class="far fa-newspaper"></i> Reader</li></a>
                     </ul>
                 </div>
                 <div id="topRightHeader" class="d-flex flex-row-reverse pr-2">
                     <ul>
-                        <a href="#" @click="newArticlePage"><li class="writeIcon rounded p-1"><i class="far fa-plus-square"></i> Write</li></a>
+                        <a href="#" @click="newArticleForm"><li class="writeIcon rounded p-1"><i class="far fa-plus-square"></i> Write</li></a>
                         <a href="#"><li class="profilePic"><i class="fas fa-image fa-lg"></i></li></a>
                         <a href="#"><li class="notification"><i class="fas fa-bell fa-lg"></i></li></a>
                         <label></label>
@@ -35,7 +35,7 @@
             </div>
         </header>
         <div class="d-flex flex-row justify-content-start">
-            <nav>
+            <nav class="border">
                 <ul>
                     <a href="#" @click="listArticlePage">
                         <li>
@@ -61,10 +61,10 @@
                                 <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Themes
                                 </button>
-                                <div class="dropdown-menu dropdown-menu-right">
+                                <div class="dropdown-menu">
                                     <button class="dropdown-item" type="button" @click="changeTheme('white', 'black')">Light</button>
                                     <button class="dropdown-item" type="button" @click="changeTheme('#3e4444', 'white')">Dark</button>
-                                    <button class="dropdown-item" type="button" @click="changeTheme('white', 'black')">Green</button>
+                                    <button class="dropdown-item" type="button" @click="changeTheme('#d5f4e6', 'black')">Sky</button>
                                     <button class="dropdown-item" type="button" @click="changeTheme('#d6cbd3', 'black')">Blush</button>
                                 </div>
                             </div>
@@ -91,7 +91,7 @@
                         <template v-for="article in filterArticle">
                             <div class="mainRow border p-1 d-flex flex-row justify-content-between align-items-center align-content-center">
                                 <div>
-                                    <h3>{{ article.title }}</h3>
+                                    <h3><a href="#" @click.prevent="showArticlePage(article._id)">{{ article.title }}</a></h3>
                                     <p>{{ article.created_at }}</p>
                                 </div>
                                 <div class="options">
@@ -100,8 +100,8 @@
                                             <i class="fas fa-ellipsis-h"></i>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right">
-                                            <button class="dropdown-item" type="button">Edit</button>
-                                            <button class="dropdown-item" type="button">Delete</button>
+                                            <button class="dropdown-item" type="button" @click.prevent="editArticlePage(article._id)">Edit</button>
+                                            <button class="dropdown-item" type="button" @click.prevent="deleteArticle(article._id)">Delete</button>
                                         </div>
                                     </div>
                                 </div>
@@ -109,20 +109,32 @@
                         </template>
                     </div>
                 </div>
-                <div v-if="newArticle">
+                <div v-if="newArticle || showArticle || editArticle">
                     <div class="d-flex flex-column">
                         <div class="mainRow">
+                            <template v-if="newArticle || editArticle">
                             Title
                             <br>
                             <input type="text" class="border rounded" v-model="articleTitle">
                         </div>
-                        
                         <div class="mainRow">
                             Content
                             <br>
                             <textarea class="border rounded" v-model="articleContent"></textarea>
                             <input type="submit" @click="createArticle">
                         </div>
+                        </template>
+                        <template v-if="showArticle">
+                            <div id="article">
+                                <div class="mainRow">
+                                    {{ articleTitle }}<br>
+                                    {{ articleDate }}
+                                </div>
+                                <div class="mainRow">
+                                    <pre>{{ articleContent }}</pre>
+                                </div>
+                            </div>
+                        </template>
                     </div>
                 </div>
             </main>
