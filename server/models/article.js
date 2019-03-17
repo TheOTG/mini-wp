@@ -7,7 +7,9 @@ let articleSchema = new Schema({
     created_at: {
         type: Date,
         default: new Date()
-    }
+    },
+    author: mongoose.Types.ObjectId,
+    featured_image: String
 })
 
 const Article = mongoose.model('Articles', articleSchema)

@@ -11,6 +11,18 @@ class ArticleController {
         })
     }
 
+    static myList(req, res) {
+        Article.find({
+            author: req.author
+        })
+        .then(results => {
+            res.status(200).json(results)
+        })
+        .catch(err => {
+            res.status(500).json(err)
+        })
+    }
+
     static findOne(req, res) {
         Article.findOne({
             _id: req.params.id
@@ -24,7 +36,15 @@ class ArticleController {
     }
 
     static create(req, res) {
-        Article.create({ ...req.body })
+        let imageUrl = null
+        if(req.file) {
+            imageUrl = req.file.cloudStoragePublicUrl
+        }
+        Article.create({
+            ...req.body,
+            author: req.author,
+            featured_image: imageUrl
+        })
         .then(result => {
             res.status(201).json(result)
         })
@@ -34,6 +54,11 @@ class ArticleController {
     }
 
     static update(req, res) {
+        let imageUrl = null
+        if(req.file) {
+            imageUrl = req.file.cloudStoragePublicUrl
+            req.body.featured_image = imageUrl
+        }
         Article.updateOne({
             _id: req.params.id
         }, {

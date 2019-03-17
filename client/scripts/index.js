@@ -1,18 +1,24 @@
-const baseURL = 'http://localhost:3000'
+const baseURL = 'http://miniwp-server.kennyanthonythe.xyz'
+// const baseURL = 'http://localhost:3000'
 
 var vm = new Vue({
-    el: '#mainBody',
+    el: '#app',
     data: {
-        listArticle: true,
+        listArticle: false,
         newArticle: false,
         showArticle: false,
         editArticle: false,
         search: '',
         articles: [],
-        articleId: '',
-        articleTitle: '',
-        articleContent: '',
-        articleDate: ''
+        userArticles: [],
+        articleId: null,
+        articleTitle: null,
+        articleContent: null,
+        articleDate: null,
+        featuredImage: null,
+        isLogin: false,
+        showDelete: false,
+        isLoading: false
     },
     computed: {
         filterArticle() {
@@ -21,120 +27,63 @@ var vm = new Vue({
             })
         }
     },
+    mounted() {
+        if(localStorage.access_token) {
+            this.isLogin = true
+            this.getArticles()
+        }
+    },
     methods: {
-        resetTitleAndContent() {
+        convertDate(date) {
+            let timestamp = new Date(date)
+            let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+            return `${timestamp.getDate()} ${months[timestamp.getMonth() - 1]} ${timestamp.getFullYear()}`
+        },
+        getArticles() {
+            axios.get(`${baseURL}/articles`, {
+                headers: {
+                    access_token: localStorage.access_token
+                }
+            })
+            .then(({ data }) => {
+                this.resetArticle()
+                this.articles = data
+                this.togglePage(true, false, false, false)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        },
+        getMyArticles() {
+            axios.get(`${baseURL}/articles/user`, {
+                headers: {
+                    access_token: localStorage.access_token
+                }
+            })
+            .then(({ data }) => {
+                this.articles = data
+                this.showDelete = true
+                this.togglePage(true, false, false, false)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        },
+        resetArticle() {
             this.articleId = ''
             this.articleTitle = ''
             this.articleContent = ''
             this.articleDate = ''
+            this.featuredImage = null
+            this.imageFile = null
+            this.imageUrl = null
+            this.showDelete = false
         },
         togglePage(isList, isNew, isEdit, isShow) {
             this.listArticle = isList
             this.newArticle = isNew
             this.editArticle = isEdit
             this.showArticle = isShow
-        },
-        listArticlePage() {
-            this.togglePage(true, false, false, false)
-            this.resetTitleAndContent()
-            this.getArticles()
-        },
-        newArticleForm() {
-            this.resetTitleAndContent()
-            this.togglePage(false, true, false, false)
-        },
-        showArticlePage(id) {
-            axios.get(`${baseURL}/articles/${id}`)
-            .then(({ data }) => {
-                console.log(data)
-                this.articleId = data._id
-                this.articleTitle = data.title
-                this.articleContent = data.content
-                this.articleDate = data.created_at
-                this.togglePage(false, false, false, true)
-            })
-            .catch(err => {
-                console.log(err)
-            })
-        },
-        editArticlePage(id) {
-            axios.get(`${baseURL}/articles/${id}`)
-            .then(({ data }) => {
-                console.log(data)
-                this.articleId = data._id
-                this.articleTitle = data.title
-                this.articleContent = data.content
-                this.articleDate = data.created_at
-                this.togglePage(false, false, true, false)
-            })
-            .catch(err => {
-                console.log(err)
-            })
-        },
-        deleteArticle(id) {
-            axios.delete(`${baseURL}/articles/${id}`)
-            .then(({ data }) => {
-                console.log(data.message)
-                this.getArticles()
-            })
-            .catch(err => {
-                console.log(err)
-            })
-            
-        },
-        createArticle() {
-            if(this.newArticle) {
-                axios.post(`${baseURL}/articles`, {
-                    title: this.articleTitle,
-                    content: this.articleContent,
-                    created_at: new Date()
-                })
-                .then(({ data }) => {
-                    console.log(data)
-                    this.resetTitleAndContent()
-                    this.listArticlePage()
-                })
-                .catch(err => {
-                    console.log(err)
-                })
-            } else if(this.editArticle) {
-                axios.put(`${baseURL}/articles/${this.articleId}`, {
-                    title: this.articleTitle,
-                    content: this.articleContent,
-                })
-                .then(({ data }) => {
-                    console.log(data)
-                    this.resetTitleAndContent()
-                    this.listArticlePage()
-                })
-                .catch(err => {
-                    console.log(err)
-                })
-            }
-        },
-        getArticles() {
-            axios.get(`${baseURL}/articles`)
-            .then(({ data }) => {
-                vm.articles = data
-            })
-            .catch(err => {
-                console.log(err)
-            })
-        },
-        changeTheme(bgColor, textColor) {
-            $('body')[0].style.backgroundColor = bgColor
-            $('body')[0].style.color = textColor
-            // axios.get(`${baseURL}/users/1`)
-            // .then(({ data }) => {
-            //     document.querySelector('body').style.backgroundColor = data.bgColor
-            //     document.querySelector('body').style.color = data.textColor
-            //     console.log(data)
-            // })
-            // .catch(err => {
-            //     console.log(err)
-            // })
         }
     }
 })
-
-vm.getArticles()
