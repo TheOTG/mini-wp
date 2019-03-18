@@ -11,6 +11,10 @@ Client setup:
 1. Run "npm install -g live-server" in the terminal if you don't have it
 2. Run "live-server --host=localhost" in the terminal
 
+demo website: http://miniwp.kennyanthonythe.xyz
+
+Customize color theme on the left navigation bar is still work in progress
+
 ## List of user routes:
 
 Route            | HTTP   | Request                     | Response

@@ -1,5 +1,5 @@
-const baseURL = 'http://miniwp-server.kennyanthonythe.xyz'
-// const baseURL = 'http://localhost:3000'
+// const baseURL = 'http://miniwp-server.kennyanthonythe.xyz'
+const baseURL = 'http://localhost:3000'
 
 var vm = new Vue({
     el: '#app',
